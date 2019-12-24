@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>CSGOStats.Services.HistoryParse.Objects</RootNamespace>
+    <AssemblyName>CSGOStats.Services.HistoryParse.Objects</AssemblyName>
+    <Authors />
+    <Company />
+    <Product />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSGOStats.Infrastructure.Extensions" Version="0.1.2" />
+    <PackageReference Include="CSGOStats.Infrastructure.Messaging" Version="0.1.1" />
+    <PackageReference Include="CSGOStats.Infrastructure.Validation" Version="0.1.2" />
+  </ItemGroup>
+
+</Project>

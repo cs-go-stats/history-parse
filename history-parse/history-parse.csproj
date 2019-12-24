@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>CSGOStats.Services.HistoryParse</RootNamespace>
+    <AssemblyName>CSGOStats.Services.HistoryParse</AssemblyName>
+    <Version>0.1.0</Version>
+    <Authors />
+    <Company />
+    <Product />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSGOStats.Infrastructure.DataAccess" Version="0.1.2" />
+    <PackageReference Include="CSGOStats.Infrastructure.Extensions" Version="0.1.2" />
+    <PackageReference Include="CSGOStats.Infrastructure.Messaging" Version="0.1.1" />
+    <PackageReference Include="CSGOStats.Infrastructure.PageParse" Version="0.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.0" />
+    <PackageReference Include="NodaTime" Version="2.4.7" />
+    <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
+    <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\history-parse-objects\history-parse-objects.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.Debug.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.Production.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

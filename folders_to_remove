@@ -1,0 +1,6 @@
+./history-parse/bin/
+./history-parse/obj/
+./history-parse-objects/bin/
+./history-parse-objects/obj/
+./history-parse-tests/bin/
+./history-parse-tests/obj/
