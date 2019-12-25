@@ -1,3 +1,5 @@
+#./pack.sh history-parse 0.x.y
+
 service_name=$1
 version=$2
 
@@ -22,7 +24,7 @@ rm -rf ./out &&
 
 docker stop $service_name || true
 docker container rm $service_name || true
-docker image rm $service_name:$version || true
+docker images -q $service_name | xargs docker image rm
 
 docker build -t $service_name:$version -f Dockerfile . && 
 	docker create --name $service_name --network cs-go-stats_prime $service_name:$version &&
