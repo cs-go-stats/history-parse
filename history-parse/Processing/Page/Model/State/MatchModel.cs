@@ -1,4 +1,4 @@
-﻿using CSGOStats.Infrastructure.PageParse.Page;
+﻿using CSGOStats.Infrastructure.PageParse.Page.Parsing;
 using CSGOStats.Infrastructure.PageParse.Structure.Containers;
 using CSGOStats.Infrastructure.PageParse.Structure.Markers;
 using CSGOStats.Services.HistoryParse.Processing.Mappings.Attributes;

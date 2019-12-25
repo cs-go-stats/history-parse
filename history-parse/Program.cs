@@ -3,7 +3,7 @@ using CSGOStats.Infrastructure.DataAccess.Contexts;
 using CSGOStats.Infrastructure.DataAccess.Repositories;
 using CSGOStats.Infrastructure.Extensions;
 using CSGOStats.Infrastructure.Messaging.Transport;
-using CSGOStats.Infrastructure.PageParse.Page;
+using CSGOStats.Infrastructure.PageParse.Page.Parsing;
 using CSGOStats.Services.HistoryParse.Aggregate;
 using CSGOStats.Services.HistoryParse.Aggregate.Data;
 using CSGOStats.Services.HistoryParse.Config;
@@ -11,9 +11,10 @@ using CSGOStats.Services.HistoryParse.Config.Settings;
 using CSGOStats.Services.HistoryParse.Processing;
 using CSGOStats.Services.HistoryParse.Processing.Page.Model.State;
 using CSGOStats.Services.HistoryParse.Processing.Parsing;
-using CSGOStats.Services.HistoryParse.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz;
+using Quartz.Impl;
 using Serilog;
 
 namespace CSGOStats.Services.HistoryParse
@@ -23,16 +24,17 @@ namespace CSGOStats.Services.HistoryParse
         private static async Task Main()
         {
             var configuration = CreateConfiguration();
-            var provider = CreateServiceProvider(configuration);
+            var serviceProvider = CreateServiceProvider(configuration);
+            var runtime = await new Startup(configuration, serviceProvider).CreateRuntimeAsync();
 
             try
             {
-                await provider.GetService<BaseDataContext>().Database.EnsureCreatedAsync();
-                await provider.GetService<Processor>().RunAsync();
+                await runtime.RunAsync();
+                await Task.Delay(-1);
             }
             finally
             {
-                await provider.DisposeAsync();
+                await runtime.ShutdownAsync();
             }
         }
 
@@ -41,7 +43,6 @@ namespace CSGOStats.Services.HistoryParse
             // todo: service collection to core lib
             return new ServiceCollection()
                 .AddScoped<Processor>()
-                .AddScoped<IDataLoader, HttpDataLoader>()
                 .AddScoped<IPageParser<HistoryPageModel>, Parser>()
                 .AddScoped<IEventBus, RabbitMqEventBus>()
                 .ConfigureRabbitMqConnectionSetting(configuration)
@@ -49,11 +50,13 @@ namespace CSGOStats.Services.HistoryParse
                 .ConfigureLogging(configuration)
                 .ConfigureDatabase(configuration)
                 .AddScoped<AggregateFacade>()
+                .AddSingleton<ISchedulerFactory, StdSchedulerFactory>()
                 .BuildServiceProvider();
         }
 
         // todo: configuration to core lib
         private static IConfigurationRoot CreateConfiguration() => new ConfigurationBuilder()
+            .AddJsonFile($"appsettings.json", optional: false, reloadOnChange: true)
 #if DEBUG
             .AddJsonFile($"appsettings.Debug.json", optional: false, reloadOnChange: true)
 #else
