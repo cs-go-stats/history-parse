@@ -1,14 +1,14 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using CSGOStats.Infrastructure.Messaging.Transport;
-using CSGOStats.Infrastructure.PageParse.Page;
+using CSGOStats.Infrastructure.PageParse.Page.Loading;
+using CSGOStats.Infrastructure.PageParse.Page.Parsing;
 using CSGOStats.Infrastructure.Validation;
 using CSGOStats.Services.HistoryParse.Aggregate;
 using CSGOStats.Services.HistoryParse.Config.Settings;
 using CSGOStats.Services.HistoryParse.Extensions;
 using CSGOStats.Services.HistoryParse.Objects;
 using CSGOStats.Services.HistoryParse.Processing.Page.Model.State;
-using CSGOStats.Services.HistoryParse.Utils;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
@@ -16,7 +16,6 @@ namespace CSGOStats.Services.HistoryParse.Processing
 {
     internal class Processor
     {
-        private readonly IDataLoader _dataLoader;
         private readonly IPageParser<HistoryPageModel> _pageParser;
         private readonly IEventBus _eventBus;
         private readonly ILogger<Processor> _logger;
@@ -25,7 +24,6 @@ namespace CSGOStats.Services.HistoryParse.Processing
         private readonly AggregateFacade _aggregateFacade;
 
         public Processor(
-            IDataLoader dataLoader,
             IPageParser<HistoryPageModel> pageParser,
             IEventBus eventBus,
             ILogger<Processor> logger,
@@ -33,7 +31,6 @@ namespace CSGOStats.Services.HistoryParse.Processing
             MatchStarSetting matchStarSetting,
             AggregateFacade aggregateFacade)
         {
-            _dataLoader = dataLoader.NotNull(nameof(dataLoader));
             _pageParser = pageParser.NotNull(nameof(pageParser));
             _eventBus = eventBus.NotNull(nameof(eventBus));
             _logger = logger.NotNull(nameof(logger));
@@ -48,8 +45,7 @@ namespace CSGOStats.Services.HistoryParse.Processing
             var (aggregate, aggregateUpdated) = (await _aggregateFacade.FindOrCreateAsync(), false);
             do
             {
-                var content = await GetHistoryPageAsync(page * 100);
-                var result = await _pageParser.ParseAsync(content); // todo catch exception here
+                var result = await _pageParser.ParseAsync(GetHistoryPageLoader(page * 100)); // todo catch exception here
                 
                 foreach (var (day, match, index) in result.Days.SelectMany(d => d.Matches.Select((x, i) => (d.Day, x, i))))
                 {
@@ -69,12 +65,6 @@ namespace CSGOStats.Services.HistoryParse.Processing
 
                 page++;
             } while (true);
-        }
-
-        private Task<string> GetHistoryPageAsync(int offset)
-        {
-            _logger.LogInformation($"Requesting history with offset: {offset}.");
-            return _dataLoader.GetRawAsync($"https://www.hltv.org/results?offset={offset}");
         }
 
         // todo: split method to: pre-check / process / notify
@@ -112,5 +102,8 @@ namespace CSGOStats.Services.HistoryParse.Processing
                     match.Team2,
                     match.Event,
                     match.StarRating()));
+
+        private static IContentLoader GetHistoryPageLoader(int offset) =>
+            new HttpContentLoader($"https://www.hltv.org/results?offset={offset}");
     }
 }
