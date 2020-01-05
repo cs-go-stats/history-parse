@@ -1,13 +1,11 @@
 ﻿using System;
-using CSGOStats.Infrastructure.DataAccess.Entities;
+using CSGOStats.Services.Core.Handling.Entities;
 
 namespace CSGOStats.Services.HistoryParse.Aggregate.Entities
 {
-    public class HistoryParse : AggregateRoot, IHaveIdEntity
+    public class HistoryParse : AggregateRoot
     {
         public Guid LastProcessedMatchId { get; private set; }
-
-        public HistoryParse() { }
 
         public HistoryParse(Guid id, long version, Guid lastProcessedMatchId) 
             : base(id, version)

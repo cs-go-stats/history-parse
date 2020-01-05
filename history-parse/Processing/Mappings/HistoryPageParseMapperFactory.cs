@@ -11,10 +11,6 @@ namespace CSGOStats.Services.HistoryParse.Processing.Mappings
         {
             switch (mapperCode)
             {
-                case "AnchorLink":
-                    return new AnchorLinkMapper();
-                case "ImageTitle":
-                    return new ImageTitleMapper();
                 case GroupDateValueAttribute.MapCode:
                     return new GroupDateMapper();
                 default:

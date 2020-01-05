@@ -1,13 +1,14 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using CSGOStats.Extensions.Extensions;
+using CSGOStats.Extensions.Validation;
 using CSGOStats.Infrastructure.Messaging.Transport;
 using CSGOStats.Infrastructure.PageParse.Page.Loading;
 using CSGOStats.Infrastructure.PageParse.Page.Parsing;
-using CSGOStats.Infrastructure.Validation;
 using CSGOStats.Services.HistoryParse.Aggregate;
 using CSGOStats.Services.HistoryParse.Config.Settings;
 using CSGOStats.Services.HistoryParse.Extensions;
-using CSGOStats.Services.HistoryParse.Objects;
+using CSGOStats.Services.HistoryParse.Processing.Factories;
 using CSGOStats.Services.HistoryParse.Processing.Page.Model.State;
 using Microsoft.Extensions.Logging;
 using NodaTime;
@@ -95,13 +96,7 @@ namespace CSGOStats.Services.HistoryParse.Processing
         }
 
         private Task NotifyMatchParsedAsync(MatchModel match) => _eventBus
-            .PublishAsync(
-                new HistoricalMatchParsed(
-                    match.Link,
-                    match.Team1,
-                    match.Team2,
-                    match.Event,
-                    match.StarRating()));
+            .PublishAsync(message: HistoricalMatchParsedFactory.Create(match));
 
         private static IContentLoader GetHistoryPageLoader(int offset) =>
             new HttpContentLoader($"https://www.hltv.org/results?offset={offset}");

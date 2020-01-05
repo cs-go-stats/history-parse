@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using CSGOStats.Extensions.Extensions;
 using CSGOStats.Extensions.Validation;
-using CSGOStats.Infrastructure.Extensions;
 using CSGOStats.Infrastructure.PageParse.Mapping;
 using HtmlAgilityPack;
 using NodaTime;

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CSGOStats.Services.Core.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CSGOStats.Services.HistoryParse.Aggregate.Entities
@@ -7,7 +8,7 @@ namespace CSGOStats.Services.HistoryParse.Aggregate.Entities
     {
         public void Configure(EntityTypeBuilder<HistoryParse> builder)
         {
-            builder.ToTable(nameof(HistoryParse), Service.Name); // todo: configure schema in shared package
+            builder.RegisterTable(Service.Name);
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).IsRequired().ValueGeneratedNever();
             builder.Property(x => x.LastProcessedMatchId).IsRequired();

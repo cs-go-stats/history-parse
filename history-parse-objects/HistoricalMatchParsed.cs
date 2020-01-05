@@ -1,6 +1,5 @@
-﻿using System;
+﻿using CSGOStats.Extensions.Validation;
 using CSGOStats.Infrastructure.Messaging.Payload;
-using CSGOStats.Infrastructure.Validation;
 
 namespace CSGOStats.Services.HistoryParse.Objects
 {
@@ -23,19 +22,11 @@ namespace CSGOStats.Services.HistoryParse.Objects
             string @event,
             int stars)
         {
-            Link = link.NotNull(nameof(link)).HltvUri();
+            Link = link.NotNull(nameof(link));
             Team1 = team1.NotNull(nameof(team1));
             Team2 = team2.NotNull(nameof(team2));
             Event = @event.NotNull(nameof(@event));
             Stars = stars.Natural(nameof(stars));
         }
-    }
-
-    public static class Ext
-    {
-        private const string HltvRoot = "https://hltv.org";
-
-        [Obsolete]
-        public static string HltvUri(this string x) => HltvRoot + x;
     }
 }

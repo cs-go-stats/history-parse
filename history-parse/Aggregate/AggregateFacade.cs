@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CSGOStats.Extensions.Extensions;
+using CSGOStats.Extensions.Validation;
 using CSGOStats.Infrastructure.DataAccess.Repositories;
-using CSGOStats.Infrastructure.Validation;
-using CSGOStats.Services.HistoryParse.Extensions;
 using CSGOStats.Services.HistoryParse.Processing.Page.Model.State;
 
 namespace CSGOStats.Services.HistoryParse.Aggregate
@@ -20,24 +20,24 @@ namespace CSGOStats.Services.HistoryParse.Aggregate
 
         public async Task<Entities.HistoryParse> FindOrCreateAsync()
         {
-            var entity = await _repository.FindAsync<Entities.HistoryParse>(AggregateId);
+            var entity = await _repository.FindAsync(AggregateId);
             if (entity != null)
             {
                 return entity;
             }
 
             entity = new Entities.HistoryParse(AggregateId, 1L, Guid.Empty);
-            await _repository.AddAsync(entity);
+            await _repository.AddAsync(entity.Id, entity);
 
             return entity;
         }
 
         public async Task UpdateLastProcessedAsync(MatchModel match)
         {
-            var entity = await _repository.GetAsync<Entities.HistoryParse>(AggregateId)
+            var entity = await _repository.GetAsync(AggregateId)
                 .ContinueWith(x =>
                     x.Result.UpdateLastProcessedMatch(match.NotNull(nameof(match)).Link.Guid()));
-            await _repository.UpdateAsync(entity);
+            await _repository.UpdateAsync(entity.Id, entity);
         }
     }
 }
