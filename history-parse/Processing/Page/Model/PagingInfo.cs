@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using CSGOStats.Infrastructure.Validation;
+using CSGOStats.Extensions.Validation;
 
 namespace CSGOStats.Services.HistoryParse.Processing.Page.Model
 {

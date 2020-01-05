@@ -1,3 +1,11 @@
+# v0.1.3
+## Changed
+* Added reference to Core package that allowed to simplify startup.
+
+# v0.1.2
+## Added
+* Scheduling for history parse.
+
 # v0.1.1
 ## Added
 * Scheduling for history parse.

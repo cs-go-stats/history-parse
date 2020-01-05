@@ -7,11 +7,11 @@
     <Authors />
     <Company />
     <Product />
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSGOStats.Infrastructure.Extensions" Version="0.1.2" />
-    <PackageReference Include="CSGOStats.Infrastructure.Messaging" Version="0.1.1" />
+    <PackageReference Include="CSGOStats.Services.Core" Version="0.1.0" />
   </ItemGroup>
 
 </Project>
