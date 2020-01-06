@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>CSGOStats.Services.HistoryParse</RootNamespace>
     <AssemblyName>CSGOStats.Services.HistoryParse</AssemblyName>
-    <Version>0.1.3</Version>
+    <Version>0.1.4</Version>
     <Authors />
     <Company />
     <Product />
@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="CSGOStats.Infrastructure.PageParse" Version="0.2.1" />
-    <PackageReference Include="CSGOStats.Services.Core" Version="0.1.0" />
+    <PackageReference Include="CSGOStats.Services.Core" Version="0.1.1" />
   </ItemGroup>
 
   <ItemGroup>

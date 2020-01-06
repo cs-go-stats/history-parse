@@ -20,16 +20,20 @@ namespace CSGOStats.Services.HistoryParse
     {
         private static async Task Main()
         {
+#if DEBUG
+            var environment = Environments.Development;
+#else
+            var environment = Environments.Production;
+#endif
             var startupBuilder = await Startup
-                .ForEnvironment(Service.Name, Environments.Development)
+                .ForEnvironment(Service.Name, environment)
                 .WithMessaging<Service>()
-                .WithLogging()
                 .UsesPostgres()
                 .WithJobsAsync(ScheduleExtensions.ConfigureJobsAsync);
             await startupBuilder
                 .ConfigureServices(ConfigureServiceProvider)
                 .RunAsync(
-                    actionBeforeStart: services =>services.EnsureDatabaseCreated());
+                    actionBeforeStart: services => services.EnsureDatabaseCreated());
         }
 
         private static IServiceCollection ConfigureServiceProvider(this IServiceCollection services, IConfigurationRoot configuration)
