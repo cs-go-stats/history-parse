@@ -15,7 +15,7 @@ namespace CSGOStats.Services.HistoryParse.Scheduling
         {
             await scheduler.ScheduleJob(
                 jobDetail: serviceProvider.CreateJobTemplate<DefaultJob>(),
-                trigger: SchedulerExtensions.CreateCronScheduledTriggerFromConfiguration(configuration, "Jobs:GamePageParse:CronExpression"));
+                trigger: SchedulerExtensions.CreateCronScheduledTriggerFromConfiguration(configuration, "Jobs:Default:CronExpression"));
         }
     }
 }
