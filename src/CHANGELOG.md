@@ -1,3 +1,13 @@
+# v0.1.5
+## Added
+* Database migrations.
+* Registration of already parsed history.
+* Job for weekly forced history parse.
+## Changed
+* Refactored history parse settings.
+## Removed
+* `HistoryParse` aggregate.
+
 # v0.1.4
 ## Changed
 * Fixed startup issues related to Core functionality.
@@ -17,8 +27,3 @@
 # v0.1.0
 ## Added
 * Basic implementation of history parse and message publish for each match; configurable conditions for early process terminating.
-
-# vTemplate
-## Added
-## Changed
-## Removed

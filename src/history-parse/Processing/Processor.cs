@@ -1,11 +1,14 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using CSGOStats.Extensions.Extensions;
 using CSGOStats.Extensions.Validation;
+using CSGOStats.Infrastructure.DataAccess.Repositories;
 using CSGOStats.Infrastructure.Messaging.Transport;
 using CSGOStats.Infrastructure.PageParse.Page.Loading;
 using CSGOStats.Infrastructure.PageParse.Page.Parsing;
-using CSGOStats.Services.HistoryParse.Aggregate;
+using CSGOStats.Services.Core.Handling.Storage;
+using CSGOStats.Services.HistoryParse.Aggregate.Entities;
 using CSGOStats.Services.HistoryParse.Config.Settings;
 using CSGOStats.Services.HistoryParse.Extensions;
 using CSGOStats.Services.HistoryParse.Processing.Factories;
@@ -20,83 +23,93 @@ namespace CSGOStats.Services.HistoryParse.Processing
         private readonly IPageParser<HistoryPageModel> _pageParser;
         private readonly IEventBus _eventBus;
         private readonly ILogger<Processor> _logger;
-        private readonly DateLimitSetting _dateLimitSetting;
-        private readonly MatchStarSetting _matchStarSetting;
-        private readonly AggregateFacade _aggregateFacade;
+        private readonly IRepository<ParsedMatch> _historyParseRepository;
+        private readonly HistoryParseLimitationSetting _limitationSetting;
+        private readonly Upsert<ParsedMatch, Guid> _parsedMatchUpsert;
 
         public Processor(
             IPageParser<HistoryPageModel> pageParser,
             IEventBus eventBus,
             ILogger<Processor> logger,
-            DateLimitSetting dateLimitSetting,
-            MatchStarSetting matchStarSetting,
-            AggregateFacade aggregateFacade)
+            IRepository<ParsedMatch> historyParseRepository,
+            HistoryParseLimitationSetting limitationSetting, 
+            Upsert<ParsedMatch, Guid> parsedMatchUpsert)
         {
             _pageParser = pageParser.NotNull(nameof(pageParser));
             _eventBus = eventBus.NotNull(nameof(eventBus));
             _logger = logger.NotNull(nameof(logger));
-            _dateLimitSetting = dateLimitSetting.NotNull(nameof(dateLimitSetting));
-            _matchStarSetting = matchStarSetting.NotNull(nameof(matchStarSetting));
-            _aggregateFacade = aggregateFacade;
+            _historyParseRepository = historyParseRepository.NotNull(nameof(historyParseRepository));
+            _limitationSetting = limitationSetting.NotNull(nameof(limitationSetting));
+            _parsedMatchUpsert = parsedMatchUpsert.NotNull(nameof(parsedMatchUpsert));
         }
 
-        public async Task RunAsync()
+        public async Task RunAsync(bool isForcedRun)
         {
             var page = 0;
-            var (aggregate, aggregateUpdated) = (await _aggregateFacade.FindOrCreateAsync(), false);
+
             do
             {
                 var result = await _pageParser.ParseAsync(GetHistoryPageLoader(page * 100)); // todo catch exception here
-                
-                foreach (var (day, match, index) in result.Days.SelectMany(d => d.Matches.Select((x, i) => (d.Day, x, i))))
+
+                foreach (var (day, match) in result.Days.SelectMany(d => d.Matches.Select(x => (d.Day, x))))
                 {
-                    if (!await ProcessMatchAsync(day, match, aggregate))
+                    var matchId = match.Link.Guid();
+                    if (!await ContinueToProcessAsync(matchId, day, isForcedRun))
                     {
                         return;
                     }
 
-                    if (index != 0 || aggregateUpdated)
-                    {
-                        continue;
-                    }
-
-                    await _aggregateFacade.UpdateLastProcessedAsync(match);
-                    aggregateUpdated = true;
+                    await ProcessMatchAsync(matchId, match);
                 }
 
                 page++;
             } while (true);
         }
 
-        // todo: split method to: pre-check / process / notify
-        private async Task<bool> ProcessMatchAsync(OffsetDate date, MatchModel match, Aggregate.Entities.HistoryParse aggregate)
+        private async Task<bool> ContinueToProcessAsync(Guid matchId, OffsetDate matchDate, bool isForcedRun)
         {
-            if (aggregate.LastProcessedMatchId == match.Link.Guid())
-            {
-                _logger.LogDebug($"Match '{match.Link}' was already parsed. Processing has been terminated.");
-                return false;
-            }
-
-            if (_dateLimitSetting.LowerBound.GreaterThan(date))
+            if (_limitationSetting.MinimumMatchDate.GreaterThan(matchDate))
             {
                 _logger.LogInformation("Reached history lower bound. Processing has been terminated.");
                 return false;
             }
 
-            var rating = match.StarRating();
-            if (rating < _matchStarSetting.LowerBound)
+            if (isForcedRun)
             {
-                _logger.LogDebug($"Match '{match.Link}' skipped due to star rating condition: '{rating}'.");
                 return true;
             }
 
-            _logger.LogInformation($"Publishing match parse event for: '{match.Link}'.");
-            await NotifyMatchParsedAsync(match);
-            return true;
+            var entity = await _historyParseRepository.FindAsync(matchId);
+            if (entity != null)
+            {
+                return true;
+            }
+
+            _logger.LogInformation("Reached already processed match row. Running in 'no-force' mode. Processing has been terminated.");
+            return false;
         }
 
-        private Task NotifyMatchParsedAsync(MatchModel match) => _eventBus
-            .PublishAsync(message: HistoricalMatchParsedFactory.Create(match));
+        // todo: split method to: pre-check / process / notify
+        private async Task ProcessMatchAsync(Guid matchId, MatchModel match)
+        {
+            var rating = match.StarRating();
+            if (rating < _limitationSetting.MinimumMatchRating)
+            {
+                _logger.LogDebug($"Match '{match.Link}' skipped due to star rating condition: '{rating}'.");
+                return;
+            }
+
+            await _parsedMatchUpsert.Async(
+                matchId,
+                _ => { });
+            await NotifyMatchParsedAsync(match);
+        }
+
+        private Task NotifyMatchParsedAsync(MatchModel match)
+        {
+            _logger.LogInformation($"Publishing match parse event for: '{match.Link}'.");
+            return _eventBus.PublishAsync(message: HistoricalMatchParsedFactory.Create(match));
+        }
 
         private static IContentLoader GetHistoryPageLoader(int offset) =>
             new HttpContentLoader($"https://www.hltv.org/results?offset={offset}");

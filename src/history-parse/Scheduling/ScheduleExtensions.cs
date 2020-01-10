@@ -8,12 +8,18 @@ namespace CSGOStats.Services.HistoryParse.Scheduling
 {
     public static class ScheduleExtensions
     {
-        public static Task ConfigureJobsAsync(
+        public static async Task ConfigureJobsAsync(
             IScheduler scheduler,
             IServiceProvider serviceProvider,
-            IConfigurationRoot configuration) =>
-                scheduler.ScheduleJob(
-                    jobDetail: serviceProvider.CreateJobTemplate<DefaultJob>(),
-                    trigger: SchedulerExtensions.CreateCronScheduledTriggerFromConfiguration(configuration, "Jobs:Default:CronExpression"));
+            IConfigurationRoot configuration)
+        {
+            await scheduler.ScheduleJob(
+                jobDetail: serviceProvider.CreateJobTemplate<DefaultJob>(),
+                trigger: SchedulerExtensions.CreateCronScheduledTriggerFromConfiguration(configuration, "Jobs:Default:CronExpression"));
+
+            await scheduler.ScheduleJob(
+                jobDetail: serviceProvider.CreateJobTemplate<ForcedJob>(),
+                trigger: SchedulerExtensions.CreateCronScheduledTriggerFromConfiguration(configuration, "Jobs:Forced:CronExpression"));
+        }
     }
 }

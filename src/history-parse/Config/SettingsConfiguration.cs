@@ -12,18 +12,18 @@ namespace CSGOStats.Services.HistoryParse.Config
             this IServiceCollection serviceProvider,
             IConfigurationRoot configuration) =>
                 serviceProvider
-                    .AddSingleton(_ => 
+                    .AddSingleton(_ =>
                         configuration.GetFromConfiguration(
-                            sectionName: "MatchDateLowerBound",
-                            creatingFunctor: configurationSection => new DateLimitSetting(
-                                lowerBound: new LocalDate(
-                                    year: configurationSection["Year"].Int(),
-                                    month: configurationSection["Month"].Int(),
-                                    day: configurationSection["Day"].Int()).UtcDate())))
-                    .AddSingleton(_ => 
-                        configuration.GetFromConfiguration(
-                            sectionName: "MatchStars",
-                            creatingFunctor: configurationSection => new MatchStarSetting(
-                                lowerBound: configurationSection["LowerBound"].Int())));
+                            sectionName: "HistoryParseLimitations",
+                            creatingFunctor: configurationSection =>
+                            {
+                                var dateBoundSection = configurationSection.GetSection("MatchDateLowerBound");
+                                return new HistoryParseLimitationSetting(
+                                    minimumMatchDate: new LocalDate(
+                                        year: dateBoundSection["Year"].Int(),
+                                        month: dateBoundSection["Month"].Int(),
+                                        day: dateBoundSection["Day"].Int()).UtcDate(),
+                                    minimumMatchRating: configurationSection.GetSection("MatchStars")["LowerBound"].Int());
+                            }));
     }
 }
