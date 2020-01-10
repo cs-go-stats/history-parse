@@ -11,6 +11,19 @@ namespace CSGOStats.Services.HistoryParse.Aggregate.Data
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) =>
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(Entities.HistoryParse).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(Entities.ParsedMatch).Assembly);
+    }
+
+    public class MigrationsDataContext : HistoryParseContext
+    {
+        public MigrationsDataContext()
+            : base(new PostgreConnectionSettings(
+                host: "localhost",
+                database: "history-parse",
+                username: "postgres",
+                password: "dotFive1",
+                isAuditEnabled: false))
+        {
+        }
     }
 }

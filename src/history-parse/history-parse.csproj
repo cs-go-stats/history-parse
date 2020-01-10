@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>CSGOStats.Services.HistoryParse</RootNamespace>
     <AssemblyName>CSGOStats.Services.HistoryParse</AssemblyName>
-    <Version>0.1.4</Version>
+    <Version>0.1.5</Version>
     <Authors />
     <Company />
     <Product />
@@ -14,6 +14,10 @@
   <ItemGroup>
     <PackageReference Include="CSGOStats.Infrastructure.PageParse" Version="0.2.1" />
     <PackageReference Include="CSGOStats.Services.Core" Version="0.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +34,10 @@
     <None Update="appsettings.Production.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\EF\Migrations\" />
   </ItemGroup>
 
 </Project>

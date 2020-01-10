@@ -1,9 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CSGOStats.Infrastructure.DataAccess;
 using CSGOStats.Infrastructure.PageParse.Page.Parsing;
+using CSGOStats.Services.Core.Handling.Entities;
+using CSGOStats.Services.Core.Handling.Storage;
 using CSGOStats.Services.Core.Initialization;
-using CSGOStats.Services.HistoryParse.Aggregate;
 using CSGOStats.Services.HistoryParse.Aggregate.Data;
+using CSGOStats.Services.HistoryParse.Aggregate.Entities;
+using CSGOStats.Services.HistoryParse.Aggregate.Factories;
 using CSGOStats.Services.HistoryParse.Config;
 using CSGOStats.Services.HistoryParse.Data;
 using CSGOStats.Services.HistoryParse.Processing;
@@ -36,20 +40,23 @@ namespace CSGOStats.Services.HistoryParse
                     actionBeforeStart: services => services.EnsureDatabaseCreated());
         }
 
-        private static IServiceCollection ConfigureServiceProvider(this IServiceCollection services, IConfigurationRoot configuration)
-        {
-            return services
+        private static IServiceCollection ConfigureServiceProvider(this IServiceCollection services, IConfigurationRoot configuration) =>
+            services
                 .AddScoped<Processor>()
                 .AddScoped<IPageParser<HistoryPageModel>, Parser>()
                 .ConfigureMatchSettings(configuration)
-                .ConfigureDatabase(configuration)
-                .AddScoped<AggregateFacade>();
-        }
+                .ConfigureDatabase(configuration);
 
         private static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfigurationRoot configuration) =>
             services
-                .AddDataAccessConfiguration(configuration, usesPostgres: true)
+                .AddDataAccessConfiguration(configuration, usesMongo: false)
                 .RegisterPostgresContext<HistoryParseContext>()
-                .RegisterPostgresRepositoryFor<Aggregate.Entities.HistoryParse>();
+                .RegisterPostgresRepositoryFor<ParsedMatch>()
+                .ConfigureUpserts();
+
+        private static IServiceCollection ConfigureUpserts(this IServiceCollection services) =>
+            services
+                .AddScoped<Upsert<ParsedMatch, Guid>>()
+                .AddScoped<IEntityFactory<ParsedMatch, Guid>, ParsedMatchFactory>();
     }
 }

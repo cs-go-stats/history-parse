@@ -1,16 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using CSGOStats.Services.Core.Scheduling;
-using CSGOStats.Services.HistoryParse.Processing;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace CSGOStats.Services.HistoryParse.Scheduling
+﻿namespace CSGOStats.Services.HistoryParse.Scheduling
 {
-    public class DefaultJob : JobBase
+    public class DefaultJob : BaseHistoryParseJob
     {
         protected override string Code => nameof(DefaultJob);
 
-        protected override Task ExecuteAsync(IServiceProvider serviceProvider)=>
-            serviceProvider.GetService<Processor>().RunAsync();
+        protected override bool IsForcedRun => false;
     }
 }

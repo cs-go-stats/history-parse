@@ -4,14 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CSGOStats.Services.HistoryParse.Aggregate.Entities
 {
-    internal class HistoryParseConfiguration : IEntityTypeConfiguration<HistoryParse>
+    internal class ParsedMatchConfiguration : IEntityTypeConfiguration<ParsedMatch>
     {
-        public void Configure(EntityTypeBuilder<HistoryParse> builder)
+        public void Configure(EntityTypeBuilder<ParsedMatch> builder)
         {
             builder.RegisterTable(Service.Name);
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).IsRequired().ValueGeneratedNever();
-            builder.Property(x => x.LastProcessedMatchId).IsRequired();
         }
     }
 }
