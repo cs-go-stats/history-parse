@@ -49,7 +49,7 @@ namespace CSGOStats.Services.HistoryParse.Processing
 
             do
             {
-                var result = await _pageParser.ParseAsync(GetHistoryPageLoader(page * 100)); // todo catch exception here
+                var result = await ParseHistoricalPageAsync(page);
 
                 foreach (var (day, match) in result.Days.SelectMany(d => d.Matches.Select(x => (d.Day, x))))
                 {
@@ -66,6 +66,19 @@ namespace CSGOStats.Services.HistoryParse.Processing
             } while (true);
         }
 
+        private async Task<HistoryPageModel> ParseHistoricalPageAsync(int page)
+        {
+            try
+            {
+                return await _pageParser.ParseAsync(GetHistoryPageLoader(page * 100));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, @"Error trying to parse historical page {page}.");
+                return HistoryPageModel.Default;
+            }
+        }
+
         private async Task<bool> ContinueToProcessAsync(Guid matchId, OffsetDate matchDate, bool isForcedRun)
         {
             if (_limitationSetting.MinimumMatchDate.GreaterThan(matchDate))
@@ -80,12 +93,12 @@ namespace CSGOStats.Services.HistoryParse.Processing
             }
 
             var entity = await _historyParseRepository.FindAsync(matchId);
-            if (entity != null)
+            if (entity == null)
             {
                 return true;
             }
 
-            _logger.LogInformation("Reached already processed match row. Running in 'no-force' mode. Processing has been terminated.");
+            _logger.LogInformation($"Reached already processed match row ('{matchId}'). Running in 'no-force' mode. Processing has been terminated.");
             return false;
         }
 
@@ -99,9 +112,7 @@ namespace CSGOStats.Services.HistoryParse.Processing
                 return;
             }
 
-            await _parsedMatchUpsert.Async(
-                matchId,
-                _ => { });
+            await _parsedMatchUpsert.Async(matchId, _ => { });
             await NotifyMatchParsedAsync(match);
         }
 
