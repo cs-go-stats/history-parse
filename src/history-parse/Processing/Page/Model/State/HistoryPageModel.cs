@@ -10,6 +10,8 @@ namespace CSGOStats.Services.HistoryParse.Processing.Page.Model.State
     // todo: count in wrapped collection
     public class HistoryPageModel
     {
+        internal static HistoryPageModel Default => new HistoryPageModel();
+
         [Collection, RequiredContainer("div[@class = 'results-sublist']")]
         public WrappedCollection<HistoryDayModel> Days { get; } = new WrappedCollection<HistoryDayModel>();
     }
