@@ -1,3 +1,4 @@
+# v0.1.7
 # v0.1.6
 ## Changed
 * Fixed a bug with wrong already parsed bound find condition that interrupted parse in case of new historical entry.
