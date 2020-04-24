@@ -1,3 +1,8 @@
+# v1.0.0
+## Added
+* Initiating of publishing parsed match in messaging layer.
+* Trottling of getting history pages.
+
 # v0.1.8
 # v0.1.7
 # v0.1.6

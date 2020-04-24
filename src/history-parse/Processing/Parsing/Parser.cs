@@ -1,5 +1,5 @@
-﻿using CSGOStats.Infrastructure.PageParse.Mapping;
-using CSGOStats.Infrastructure.PageParse.Page.Parsing;
+﻿using CSGOStats.Infrastructure.Core.PageParse.Mapping;
+using CSGOStats.Infrastructure.Core.PageParse.Page.Parse;
 using CSGOStats.Services.HistoryParse.Processing.Mappings;
 using CSGOStats.Services.HistoryParse.Processing.Page.Model.State;
 

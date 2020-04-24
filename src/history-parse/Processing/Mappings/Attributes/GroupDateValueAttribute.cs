@@ -1,5 +1,5 @@
 ﻿using System;
-using CSGOStats.Infrastructure.PageParse.Mapping;
+using CSGOStats.Infrastructure.Core.PageParse.Mapping;
 
 namespace CSGOStats.Services.HistoryParse.Processing.Mappings.Attributes
 {

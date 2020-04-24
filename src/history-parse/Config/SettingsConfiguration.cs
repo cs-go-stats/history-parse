@@ -1,4 +1,4 @@
-﻿using CSGOStats.Extensions.Extensions;
+﻿using CSGOStats.Infrastructure.Core.Extensions;
 using CSGOStats.Services.HistoryParse.Config.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

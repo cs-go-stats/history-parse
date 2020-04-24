@@ -3,15 +3,17 @@ using System;
 using CSGOStats.Services.HistoryParse.Aggregate.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace CSGOStats.Services.HistoryParse.Data.EF.Migrations
 {
     [DbContext(typeof(MigrationsDataContext))]
-    partial class MigrationsDataContextModelSnapshot : ModelSnapshot
+    [Migration("20200201094011_AddedCreateDatetimeForParsedMatch")]
+    partial class AddedCreateDatetimeForParsedMatch
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

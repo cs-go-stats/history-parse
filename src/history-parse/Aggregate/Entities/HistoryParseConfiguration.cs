@@ -1,4 +1,4 @@
-﻿using CSGOStats.Services.Core.Data;
+﻿using CSGOStats.Infrastructure.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,6 +11,7 @@ namespace CSGOStats.Services.HistoryParse.Aggregate.Entities
             builder.RegisterTable(Service.Name);
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).IsRequired().ValueGeneratedNever();
+            builder.Property(x => x.CreatedAt).OffsetDateTime().HasDefaultValue(DateTimeExtensions.GetCurrentDate);
         }
     }
 }

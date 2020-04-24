@@ -1,4 +1,4 @@
-﻿using CSGOStats.Extensions.Validation;
+﻿using CSGOStats.Infrastructure.Core.Validation;
 using NodaTime;
 
 namespace CSGOStats.Services.HistoryParse.Config.Settings

@@ -1,32 +1,19 @@
-﻿using CSGOStats.Extensions.Validation;
-using CSGOStats.Infrastructure.Messaging.Payload;
+﻿using System;
+using CSGOStats.Infrastructure.Core.Communication.Payload;
+using CSGOStats.Infrastructure.Core.Validation;
 
 namespace CSGOStats.Services.HistoryParse.Objects
 {
     public class HistoricalMatchParsed : IMessage
     {
+        public Guid MatchId { get; }
+
         public string Link { get; }
 
-        public string Team1 { get; }
-
-        public string Team2 { get; }
-
-        public string Event { get; }
-
-        public int Stars { get; }
-
-        public HistoricalMatchParsed(
-            string link,
-            string team1,
-            string team2,
-            string @event,
-            int stars)
+        public HistoricalMatchParsed(Guid matchId, in string link)
         {
+            MatchId = matchId.AnythingBut(Guid.Empty, nameof(link));
             Link = link.NotNull(nameof(link));
-            Team1 = team1.NotNull(nameof(team1));
-            Team2 = team2.NotNull(nameof(team2));
-            Event = @event.NotNull(nameof(@event));
-            Stars = stars.Natural(nameof(stars));
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using CSGOStats.Infrastructure.PageParse.Page.Parsing;
+using CSGOStats.Infrastructure.Core.PageParse.Page.Parse;
 
 namespace CSGOStats.Services.HistoryParse.Processing.Page.Model.State
 {

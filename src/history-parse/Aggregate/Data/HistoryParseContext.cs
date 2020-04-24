@@ -1,4 +1,4 @@
-﻿using CSGOStats.Infrastructure.DataAccess.Contexts.EF;
+﻿using CSGOStats.Infrastructure.Core.Data.Storage.Contexts.EF;
 using Microsoft.EntityFrameworkCore;
 
 namespace CSGOStats.Services.HistoryParse.Aggregate.Data

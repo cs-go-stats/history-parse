@@ -1,7 +1,7 @@
-﻿using CSGOStats.Infrastructure.PageParse.Extraction;
-using CSGOStats.Infrastructure.PageParse.Page.Parsing;
-using CSGOStats.Infrastructure.PageParse.Structure.Containers;
-using CSGOStats.Infrastructure.PageParse.Structure.Markers;
+﻿using CSGOStats.Infrastructure.Core.PageParse.Extraction;
+using CSGOStats.Infrastructure.Core.PageParse.Page.Parse;
+using CSGOStats.Infrastructure.Core.PageParse.Page.Structure.Containers;
+using CSGOStats.Infrastructure.Core.PageParse.Page.Structure.Markers;
 
 namespace CSGOStats.Services.HistoryParse.Processing.Page.Model.State
 {

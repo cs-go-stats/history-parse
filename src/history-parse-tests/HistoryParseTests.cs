@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using CSGOStats.Infrastructure.PageParse.Page.Loading;
+using CSGOStats.Infrastructure.Core.PageParse.Page.Load;
 using CSGOStats.Services.HistoryParse.Processing.Parsing;
 using Xunit;
 

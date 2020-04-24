@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using CSGOStats.Extensions.Extensions;
-using CSGOStats.Extensions.Validation;
-using CSGOStats.Infrastructure.PageParse.Mapping;
+using CSGOStats.Infrastructure.Core.Extensions;
+using CSGOStats.Infrastructure.Core.PageParse.Mapping;
+using CSGOStats.Infrastructure.Core.Validation;
 using HtmlAgilityPack;
 using NodaTime;
 using NodaTime.Calendars;

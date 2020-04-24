@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CSGOStats.Infrastructure.DataAccess;
-using CSGOStats.Infrastructure.PageParse.Page.Parsing;
-using CSGOStats.Services.Core.Handling.Entities;
-using CSGOStats.Services.Core.Handling.Storage;
-using CSGOStats.Services.Core.Initialization;
+using CSGOStats.Infrastructure.Core.Data.Entities;
+using CSGOStats.Infrastructure.Core.Data.Storage;
+using CSGOStats.Infrastructure.Core.Extensions;
+using CSGOStats.Infrastructure.Core.Initialization;
+using CSGOStats.Infrastructure.Core.PageParse.Page.Parse;
+using CSGOStats.Infrastructure.Core.Throttling;
 using CSGOStats.Services.HistoryParse.Aggregate.Data;
 using CSGOStats.Services.HistoryParse.Aggregate.Entities;
 using CSGOStats.Services.HistoryParse.Aggregate.Factories;
 using CSGOStats.Services.HistoryParse.Config;
-using CSGOStats.Services.HistoryParse.Data;
 using CSGOStats.Services.HistoryParse.Processing;
 using CSGOStats.Services.HistoryParse.Processing.Page.Model.State;
 using CSGOStats.Services.HistoryParse.Processing.Parsing;
+using CSGOStats.Services.HistoryParse.Runtime;
 using CSGOStats.Services.HistoryParse.Scheduling;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,9 @@ namespace CSGOStats.Services.HistoryParse
     {
         private static async Task Main()
         {
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+            {
+            };
 #if DEBUG
             var environment = Environments.Development;
 #else
@@ -31,13 +35,12 @@ namespace CSGOStats.Services.HistoryParse
 #endif
             var startupBuilder = await Startup
                 .ForEnvironment(Service.Name, environment)
-                .WithMessaging<Service>()
-                .UsesPostgres()
                 .WithJobsAsync(ScheduleExtensions.ConfigureJobsAsync);
             await startupBuilder
+                .WithMessaging<Service>()
+                .UsesPostgres<HistoryParseContext>()
                 .ConfigureServices(ConfigureServiceProvider)
-                .RunAsync(
-                    actionBeforeStart: services => services.EnsureDatabaseCreated());
+                .RunAsync(new HistoryParseRuntimeAction());
         }
 
         private static IServiceCollection ConfigureServiceProvider(this IServiceCollection services, IConfigurationRoot configuration) =>
@@ -45,18 +48,16 @@ namespace CSGOStats.Services.HistoryParse
                 .AddScoped<Processor>()
                 .AddScoped<IPageParser<HistoryPageModel>, Parser>()
                 .ConfigureMatchSettings(configuration)
-                .ConfigureDatabase(configuration);
+                .ConfigureDatabase()
+                .ConfigureThrottling(configuration);
 
-        private static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfigurationRoot configuration) =>
+        private static IServiceCollection ConfigureDatabase(this IServiceCollection services) =>
             services
-                .AddDataAccessConfiguration(configuration, usesMongo: false)
-                .RegisterPostgresContext<HistoryParseContext>()
                 .RegisterPostgresRepositoryFor<ParsedMatch>()
-                .ConfigureUpserts();
-
-        private static IServiceCollection ConfigureUpserts(this IServiceCollection services) =>
-            services
                 .AddScoped<Upsert<ParsedMatch, Guid>>()
                 .AddScoped<IEntityFactory<ParsedMatch, Guid>, ParsedMatchFactory>();
+
+        private static IServiceCollection ConfigureThrottling(this IServiceCollection services, IConfigurationRoot configuration) =>
+            services.AddThrottlingFromConfiguration(configuration, "Jobs:Common");
     }
 }

@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics;
-using CSGOStats.Infrastructure.PageParse.Page.Parsing;
-using CSGOStats.Infrastructure.PageParse.Structure.Containers;
-using CSGOStats.Infrastructure.PageParse.Structure.Markers;
+using CSGOStats.Infrastructure.Core.PageParse.Page.Parse;
+using CSGOStats.Infrastructure.Core.PageParse.Page.Structure.Containers;
+using CSGOStats.Infrastructure.Core.PageParse.Page.Structure.Markers;
 
 namespace CSGOStats.Services.HistoryParse.Processing.Page.Model.State
 {
     [ModelRoot, RootContainer("*/body/div[@class = 'bgPadding']/div/div[@class = 'colCon']/div[@class = 'contentCol']/div/div[@class = 'results-holder']/div[@class = 'results-all']")]
-    [DebuggerDisplay("Day groups: {System.Linq.Enumerable.Count(Days)}.")]
-    // todo: count in wrapped collection
+    [DebuggerDisplay("Day groups: {Days.Length}.")]
     public class HistoryPageModel
     {
         internal static HistoryPageModel Default => new HistoryPageModel();
